@@ -127,3 +127,27 @@ class spc(object):
             self.summary = summary
 
         self.fig.tight_layout()
+        
+    def make_summary(self, **kwargs):
+        num_layers = len(self.layers)
+
+        self.fig, *self.subplots = plt.subplots(num_layers, **kwargs)
+        self.fig.canvas.set_window_title(self._title)
+
+        for layer, ax in zip(self.layers, self.get_subplots()):
+            summary = {}
+
+            values, center, lcl, ucl, title = layer.plot(self.data, self.size, self.newdata)
+
+            summary['name'] = title
+            summary['values'] = values
+            summary['lcl'] = lcl
+            summary['ucl'] = ucl
+            summary['center'] = center
+
+            if self.points is not None:
+                summary['violation-points'] = self.points.plot_violation_points(ax, values, center, lcl, ucl)
+
+            self.summary = summary
+
+        self.fig.tight_layout()
